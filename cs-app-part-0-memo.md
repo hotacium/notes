@@ -267,7 +267,107 @@ The operating system has two primary purposes: (1) To **protect the hardware** f
 
 ## Processes プロセス
 
-A *process* is the operating system's abstraction for a running program. Multiple processes can run concurrently on the same system, and each process appears to have exclusive use of the hardware. By *concurrently*, we mean that the instruction
+A *process* is the operating system's abstraction for a running program. Multiple processes can run concurrently on the same system, and each process appears to have exclusive use of the hardware. By *concurrently*, we mean that the instruction of one process are interleaved with the instructions of another process. The operating system performs this interleaving with a mechanism known as *context switching*.
+
+プロセスは実行中のプログラムの抽象化. 複数のプロセスがに走り、かつそれらのプログラムはハードウェアを専有しているように見える. 
+
+The operating system keeps track of all the state information that the process needs in order to run. This state, which is known as the *context*, includes information such as the current value of the PC, the register file, and the contents of main memory. At any point in time, exactly one process is running on the system. When the operating system decides to transfer control from the current process to a some new process, it performs a *context switch* by saving the context of the current process, restoring the context of the new process, and then passing control to the new process. The new process picks up exactly where it left off.
+
+OS はプロセスの実行に必要な全ての状態情報 (state information) を追跡し続けている. この状態 (state) は *context* として知られ、現在の PC やレジスタの値やメインメモリの内容を含む. OS は実行コントロールを現在のプロセスから新しいプロセスへ移動させようと決めたときに *context switch* を実行して、現在のプロセスの context を保存し 新しいプロセスの context を復帰させ、コントロールを新しいプロセスへ渡す. 
+
+```
+shell process
+-> context switch
+-> command process
+-> context switch
+-> shell process
+```
+
+
+## Threads スレッド
+
+In modern system a process can actually consist of multiple execution units, called *threads*, each **running in the context of the process** and **sharing the same code and global data**. 
+
+一つの context 内で実行され、同じコードとグローバルデータを共有する.   
+-> プロセスよりもコンテキスト情報が最小で済むので切り替えが速くなる. 
+
+
+## Virtual Memory 仮想メモリ
+
+*Virtual memory* is an abstraction that provides each process with the illusion that it has exclusive use of the main memory. Each process the same uniform view of memory, which is known as its *virtual address space*. 
+
+
+```
+// Linux process virtual address space.
+
+------------------------- 0xffffffff
+kernel virtual memory
+-------------------------
+user stack
+
+
+-------------------------
+
+
+memory mapped region for shared libraries
+-------------------------
+
+
+run-time heap
+-------------------------+
+read/write data          |
+-------------------------+ program code and data
+read-only code and data  |
+-------------------------+
+unused
+------------------------- 0x0
+```
+
+
+In Linux, the topmost 1/4 of the address space is reserved for **code and data in the operating system** that is common to all process. The bottommost 3/4 of the address space holds **the code and data defined by the user's processes**. 
+
+The virtual address space seen by each process consists of a number of well-defined areas, each with a specific purpose.
+
+- *Program code and data*. Code begins at the same fixed address, followed by data locations that correspond to global C variables. The code and data areas are initialized directly from the contents of an executable object file.
+
+実行ファイルの内容で直接初期化される. 
+
+- *Heap*. The code and data ares are followed immediately by the run-time *heap*. Unlike the code and data areas, which are fixed in size once the process begins running, the heap expands and contracts dynamically at runtime as a result of calls to C standard library routines such as `malloc` and `free`.
+
+C では `malloc` / `free` で操作される. Rust では `Box` など. 
+
+- *Shared libraries*. The area holds the code and data for *shared libraries* such as the C standard library and the math library.
+
+
+- *Stack*. the space is the *user stack* that the compiler uses to implement function calls. Like the heap, the user stack expands and contracts dynamically during the execution of the program. In particular, each time we call a function, the stack grows. Each time we return from a function, it contracts. 
+
+コンパイラが関数呼び出しを実装するために使用する. プログラムの実行中に動的に構築される. 特に関数を呼び出すたびにスタックは大きくなる.
+
+- *Kernel virtual memory*. The *kernel* is the part of the operating system that is always resident in memory. The top 1/4 of the address space is reserved for the kernel. Application programs are **not allowed to read or write** the contents of this area or to directly call functions defined in the kernel code.
+
+ユーザースペースのプログラムには 読み書き権限がない. 
+
+
+## Files ファイル
+
+A Unix file is a **sequence of bytes**, nothing more and nothing less. Every I/O device, including disks, keyboards, displays, and even networks, is modeled as a file. All input and output in the system  is performed by reading and writing files, using a set of operating system function known as *system calls*.
+
+Unix のファイルはバイト列. すべての I/O 機器 (ディスク、キーボード、ディスプレイ、ネットワーク) はファイルをモデルにしている. すべての入出力はファイルの読み書きとして実行され、それにはシステムコールという OS 機能群を用いる.
+
+File system provides applications with a uniform view of all of the varied I/O devices that might be contained in the system. 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
