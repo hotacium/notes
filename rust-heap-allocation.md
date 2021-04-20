@@ -1,8 +1,8 @@
 # Rust のスマートポインタ
 
-[The Rust Programming Language 日本語版](https://doc.rust-jp.rs/book-ja/ch15-00-smart-pointers.html) を読んだまとめ. 
+スマートポインタ関連がわからなかったときに調べたメモをつなげたものです.
 
-
+---
 ## スマートポインタ全般について
 > スマートポインタは、ポインタとして振る舞うだけでなく、追加のメタデータと能力があるデータ構造
 [引用](https://doc.rust-jp.rs/book-ja/ch15-00-smart-pointers.html)
@@ -11,6 +11,7 @@
 1. ポインタとしてヒープに確保した領域のデータを参照
 2. メタデータやポインタ以外の機能を保持する
 
+---
 ## `Deref` トレイト
 `Deref` トレイトを用いて参照外し演算子 (`*`) の振る舞いを実装・カスタマイズすることができる. 
 
@@ -50,6 +51,7 @@ fn main() {
 
 参照を外すとき (`*y`) においてコンパイラは `MyBox<T>` の `deref` メソッドを呼び出す. すなわち、 **`*y` は `*(y.deref())` として解釈される**.  
 
+---
 ## 参照外し型強制
 参照外し型強制は、関数やメソッドの**引数**に対して作用する. 参照外し型強制のおかげで簡単に引数へ値を渡すことができる. 
 
@@ -69,8 +71,10 @@ fn main() {
 
 原文の記述:
 > Deref coercion converts such a type into a reference to another type. For example, deref coercion can convert `&String` to `&str` because  `String` implements the `Deref` trait such that it returns `str`.
+
 [引用](https://doc.rust-lang.org/book/ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods)  
-> 参照外し型強制はそのような型 (訳者注: `Deref` トレイトを実装している型) を他の型の参照へ変換します. 例えば、参照外し型強制は `&String` を `&str` へ変換できますが、これは `String` が `str` を返すような `Deref` トレイトを実装しているためです.
+
+参照外し型強制はそのような型 (訳者注: `Deref` トレイトを実装している型) を他の型の参照へ変換します. 例えば、参照外し型強制は `&String` を `&str` へ変換できますが、これは `String` が `str` を返すような `Deref` トレイトを実装しているためです.
 
 
 #### `Deref` まとめ
@@ -78,6 +82,7 @@ fn main() {
 - 参照外しのときは 保持する値を返すために用いられる.   
 - 型変換 (参照外し型強制) のときは、参照外しに用いられる型変換 (例: `fn deref(&self) -> &T`) を応用して、関数やメソッドの引数の型をよしなにしてくれる.
 
+---
 ## `Drop` トレイト
 
 `Drop` トレイトは、ヒープに確保された領域が開放されたときに実行されるプログラムを指定できる. 
@@ -104,6 +109,18 @@ fn main() {
 [Playgroound](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=7ed3a2a393c2963f2d28e6f9b959b9e8)
 
 
+---
+## `Box<T>`, `Rc<T>`, `RefCell<T>` の違い
+- `Rc<T>`: 同じデータを複数の所有者にもたせる. c.f., `Box<T>`, `RefCell<T>` は単独の所有者のみを許容.
+- `Box<T>` では、不変借用も可変借用もコンパイル時に精査可能. c.f., `Rc<T>` では不変借用のみがコンパイル時に精査可能、 `RefCell<T>` では、不変借用も可変借用も実行時に精査される.
+- `RefCell<T>` の可変借用は実行時に精査されるため、 `RefCell<T>` が不変でも `RefCell<T>` 内の値を可変にすることができる. (不変型が必要で、かつその型の中の値を変更する必要があるときに使う)
+
+
+
+#### 参考
+- [RefCell\<T\> と内部可変パターン](https://doc.rust-jp.rs/book-ja/ch15-05-interior-mutability.html)
+
+---
 ## `Box`
 `Box` はヒープにデータを格納する.
 
@@ -120,6 +137,7 @@ fn main() {
 
 例: 二分木 (binary tree)  
 [Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=dceb54a19419e9866cfbef8a04feb0b5)  
+	
 ```rust
 type Link<T> = Option<Box<Node<T>>>;
 
@@ -133,8 +151,12 @@ struct Node<T> {
 The Rust Programming Language ではコンスリストを実装していた.
 [参考: コンスリストの実装](https://doc.rust-jp.rs/book-ja/ch15-01-box.html#%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9%E3%81%A7%E5%86%8D%E5%B8%B0%E7%9A%84%E3%81%AA%E5%9E%8B%E3%82%92%E5%8F%AF%E8%83%BD%E3%81%AB%E3%81%99%E3%82%8B)
 
+#### 参考
+- [ヒープのデータを指すBox\<T\>を使用する](https://doc.rust-jp.rs/book-ja/ch15-01-box.html)
 
-## `Rc` 参照カウンタ (Reference Counter)
+
+---
+## `Rc` 参照カウンタ (Reference Counted)
 複数の所有権を可能にする型が `Rc<T>` .  `Rc<T>` 型は値への参照の数を追跡する. 値への参照カウントが 0 になると 値は破棄される. 
 
 `Rc<T>` は、シングルスレッドでのみ使用される. マルチスレッドでの参照カウントは `Arc<T>` を使用する. 
@@ -154,12 +176,52 @@ fn main() {
 
 `Rc<RefCell<T>>` (後述) として使われることが多い. 
 
-## `Arc` 
+---
+## `Arc` (Atomic Reference Counted)
+> When shared ownership between threads is needed, `Arc` (Atomic Reference Counted) can be used.  
 
+[Arc](https://doc.rust-lang.org/stable/rust-by-example/std/arc.html)
+
+スレッド間の共有所有権が必要なときに、`Arc` を使うことができる.
+
+基本的に `Rc` と同じ性質をもつ.
+
+`Arc<Mutex<T>>` として使われることが多い.
+
+
+---
 ## `Cell` 
 
-## `RefCell`
+工事中
 
+#### Interior Mutability
+interior: 内部の、内側の
+
+> Sometimes a type needs to be mutated while having multiple aliases. In Rust this is achieved using a pattern called *interior mutability*. A type has interior mutability if its internal state can be changed through a shared reference to it.
+
+[Interior Mutability](https://doc.rust-lang.org/reference/interior-mutability.html) 
+
+ときどき、型は複数のエイリアスを保持しながら可変になる必要がある. Rust ではこれを *interior mutability* (内部可変性) と呼ばれるパターンを用いて行っている. 型の内部状態が型への共有された参照を通して変化可能ならば、型は内部可変性をもつ.
+
+#### 参考
+- [std::cell](https://doc.rust-lang.org/std/cell/index.html)
+
+
+---
+## `RefCell<T>`
+`RefCell<T>` は、内部可変性 (interior mutability) を持つ. 内部可変性とは、そのデータへの不変参照がある時でさえもデータを可変化できる Rust のデザインパターン. 
+
+`Rc<T>` とは異なり、 `RefCell<T>` 型は、保持するデータに対して単独の所有権を表す. 
+
+同様の特徴を持つ型として `Box<T>` があるが、`RefCell<T>` と `Box<T>` では借用規則の強制の時期が異なる. 具体的には `Box<T>` はコンパイル時に借用規則のチェックが行われ、 `RefCell<T>` では実行時にチェックが行われるようになっている. `RefCell<T>` が借用規則に違反した場合は、プログラムがパニックする. 
+
+`RefCell<T>` はコンパイル時点で安全性を確認できないため、 `Box<T>` を使うことが可能なら `Box<T>` を使うべき. ただ、`Box<T>` では解決できないプログラムも存在する.
+
+
+#### 参照
+- [RefCell\<T\> と内部可変パターン](https://doc.rust-jp.rs/book-ja/ch15-05-interior-mutability.html)
+
+---
 ## `Rc<RefCell<T>>`
+`RefCell<T>` は不変の型に可変性を持たせることができる. そこで `Rc<T>` を用いることで 
 
-## idioms
