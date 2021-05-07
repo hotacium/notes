@@ -141,6 +141,13 @@ assert_eq!(iter.nth(0), Some(&2));
 assert_eq!(iter.nth(19), None);
 ```
 
+#### 関数 (クロージャ) からイテレータをつくる
+```rust
+iter::repeat_with(|| 0);
+
+```
+
+
 ## Range
 #### Range を反転させる
 ```rust

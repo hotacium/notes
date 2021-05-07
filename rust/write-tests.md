@@ -1,7 +1,7 @@
 ---
 title: "テストを書く"
 description: "Rust でユニットテストをする"
-date: "2021-03-31"
+date: "2021-04-31"
 tags: ["Rust"]
 ---
 
@@ -15,7 +15,7 @@ $ cargo test
 
 print デバッグと並行したい場合、
 ```sh
-$ cargo test -- --no-capture
+$ cargo test -- --nocapture
 ```
 `--no-capture` フラッグを用いることで標準出力が表示されるようになる.
 
