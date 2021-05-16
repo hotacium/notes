@@ -1,4 +1,4 @@
-# LeetCode Cheatsheet (Rust)
+# LeetCode あれこれ
 
 ##  所有権
 
@@ -75,6 +75,13 @@ fn strtou(s: &str) -> usize {
 ```
 ---
 #### `String` を分割したい
+```rust
+
+
+
+
+```
+
 ---
 #### `String` を結合したい
 `format!` を使う. 万能だが低速.
@@ -96,6 +103,7 @@ let n = i32::pow(i, 2); // i64, isize, u32, u64, usize でも
 ```
 
 ## `map` を使う
+
 
 ## `Vec` 操作
 
