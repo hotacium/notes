@@ -99,12 +99,55 @@ fn main() {
 
 ### `max` / `min` / `max_by` / `max_by_key` / `min_by` / `min_by_key`
 
-- `max`: 
-- `min`:
-- `max_by`: 
-- `min_by`: 
-- `max_by_key`: 
-- `min_by_key`: 
+- `max` / `min`: 最大/最小の要素を得る
+- `max_by` / `min_by`: 比較関数を指定して要素を比較
+- `max_by_key` / `min_by_key`: 関数を用いて要素を加工して最大/最小を取得
+
+`max` / `min` の例
+```rust
+fn main() {
+    let iter = [1, 2, 3, 4, 5].iter();
+    
+    // 単純に最大/最小
+    assert_eq!(iter.clone().max(), Some(&5));
+    assert_eq!(iter.min(), Some(&1));
+}
+```
+
+`max_by_key` / `min_by_key` の例
+```rust
+fn main() {
+    let iter = [1, 2, 3, 4, 5].iter();
+
+    // 比較する要素に加工を加えている
+    assert_eq!(iter.clone().max_by_key(|&x| -1*x), Some(&1));
+    assert_eq!(iter.min_by_key(|&x| -1*x), Some(&5));
+}
+```
+
+`max_by` / `min_by` の例
+```rust
+fn main() {
+    let iter = [("foo", 1203), ("bar", 1409), ("hoge", 410)].iter();
+    
+    // 比較の方法を指定している
+    let max = iter.clone().max_by(|elem_0, elem_1| {
+        let (num_0, num_1) = (elem_0.1, elem_1.1);
+        num_0.cmp(&num_1) // `Ordering` を返す
+    });
+    assert_eq!(max, Some(&("bar", 1409)));
+
+    // 以下の方法でも実装可能
+    // let max = iter.clone().max_by_key(|&x| x.1);
+    // assert_eq!(max, Some(&("bar", 1409))); // 
+    
+    let min = iter.min_by(|elem_0, elem_1| {
+        let (num_0, num_1) = (elem_0.1, elem_1.1);
+        num_0.cmp(&num_1)
+    });
+    assert_eq!(min, Some(&("hoge", 410)));
+}
+```
 
 ## イテレータ自体を操作する
 - イテレータをつなげる・分割する
@@ -112,6 +155,32 @@ fn main() {
 - イテレータに新しい性質を付け加える
 
 ### `chain` / `zip` / `unzip`
+- `chain`: 2つのイテレータを連結する
+- `zip` / `unzip`: 2つの要素を持つタプルをもつイテレータをつくる / 分解する
+
+`chain` 例
+```rust
+fn main() {
+    let iter_1 = [1, 2, 3, 4, 5].iter();
+    let iter_2 = [2, 2, 2, 4, 4].iter();
+    
+    let res = iter_1.chain(iter_2).map(|&elem| elem).collect::<Vec<_>>();
+    assert_eq!(res, vec![1, 2, 3, 4, 5, 2, 2, 2, 4, 4]);
+}
+```
+`zip` 例
+```rust
+fn main() {
+    let iter_1 = [1, 2, 3].iter();
+    let iter_2 = [3, 4, 5, 6].iter(); // 余る要素は省かれる
+    
+    let res = iter_1.zip(iter_2).map(|x| {
+        let (&x1, &x2) = x;
+        x1 + x2
+    }).collect::<Vec<_>>();
+    assert_eq!(res, vec![4, 6, 8]);
+}
+```
 ### `skip` / `skip_while`
 ### `take` / `take_while`
 ### `enumerate`
@@ -120,6 +189,7 @@ fn main() {
 ### `cycle`
 ### `cloned` / `copied`
 ### `flatten`
+### `by_ref`
 
 ## イテレータの要素を操作する
 イテレータ内部の要素を操作してイテレータを変化させる.  
@@ -128,8 +198,6 @@ fn main() {
 ### `for_each` / `try_for_each`
 ### `filter`
 ### `inspect`
-### `by_ref`
-### `scan`
 
 ## `map` 系統
 `map` と他の操作を一度に行う.
@@ -146,6 +214,7 @@ fn main() {
 ### `product` 
 ### `collect`
 ### `fold` / `try_fold`
+### `scan`
 ### `reduce`
 
 ## イテレータを進める
