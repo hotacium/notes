@@ -26,10 +26,16 @@ live USB をつくってインストールした. ここは Ubuntu と全く同�
 - git
 - curl
 - build-essential
+- fcitx-mozc
 
 ## fish
 
 zsh と違っていろいろ簡単
+
+make fish default shell
+```sh
+$ sudo chsh [username] -s /usr/bin/fish
+```
 
 シェルのヘビーユーザーではないのでこれで十分
 
@@ -49,6 +55,10 @@ set fish_theme [theme]
 ```
 で OK.
 
+```sh
+. ~/.config/fish/config.fish
+```
+でリロード
 
 ## picom で背景透過
 

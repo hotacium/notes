@@ -182,7 +182,36 @@ fn main() {
 }
 ```
 ### `skip` / `skip_while`
+- `skip`: 任意の数だけスキップしたイテレータを作る
+- `skip_while`: false が出現するまでスキップしたイテレータをつくる
+
+```rust
+fn main() {
+    let iter = [2, 4, 5, 6, 8].iter();
+    let mut iter = iter.skip(2);
+    
+    assert_eq!(iter.next(), Some(&5));
+    assert_eq!(iter.next(), Some(&6));
+    assert_eq!(iter.next(), Some(&8));
+    assert_eq!(iter.next(), None);
+    
+    let iter = [2, 4, 5, 6].iter();
+    // false が出現するまでスキップするが、
+    // この例では最初が false なためスキップされない
+    let mut iter = iter.skip_while(|&&elem| 5 <= elem && elem <= 6);
+    
+    assert_eq!(iter.next(), Some(&2));
+    assert_eq!(iter.next(), Some(&4));
+    assert_eq!(iter.next(), Some(&5));
+    assert_eq!(iter.next(), Some(&6));
+    assert_eq!(iter.next(), None);
+}
+
+```
+
 ### `take` / `take_while`
+- `take`: 任意の数
+-
 ### `enumerate`
 ### `rev`
 ### `peekable`
