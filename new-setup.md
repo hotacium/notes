@@ -85,6 +85,7 @@ gnome shell で背景透過がうまく行かなかったので、使ってみ�
 
 これを使うと、ウィンドウA で開いている neovim にウィンドウB の terminal からファイルを開くことができて便利
 
+<!--
 ## 1password をインストール
 
 公式から .deb をダウンロードして、
@@ -93,6 +94,5 @@ gnome shell で背景透過がうまく行かなかったので、使ってみ�
 ```sh
 sudo apt install ./your-1password-package.deb
 ```
+-->
 
-
-## 
